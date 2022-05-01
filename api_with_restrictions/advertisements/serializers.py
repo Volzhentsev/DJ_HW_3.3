@@ -32,7 +32,8 @@ class AdvertisementSerializer(serializers.ModelSerializer):
     def validate(self, data):
         user = self.context["request"].user
         open_status = Advertisement.objects.filter(creator_id=user.id, status='OPEN').count()
-        if open_status >= settings.MAX_OPEN_ADVERTISMENT_PER_USER:
+        request_method = self.context['request'].method
+        if (request_method == 'POST' or data['status'] == 'OPEN') and open_status >= settings.MAX_OPEN_ADVERTISMENT_PER_USER:
             raise ValidationError('Too many advertisement per user!')
 
         return data
